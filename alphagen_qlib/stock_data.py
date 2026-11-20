@@ -1,3 +1,4 @@
+import os
 from typing import List, Union, Optional, Tuple
 from enum import IntEnum
 import numpy as np
@@ -18,10 +19,15 @@ _DEFAULT_QLIB_DATA_PATH = "~/.qlib/qlib_data/cn_data"
 _QLIB_INITIALIZED = False
 
 
+def resolve_qlib_path(qlib_data_path: str) -> str:
+    """Use the shared AlphaData export when $ALPHAGEN_QLIB_PATH or $QLIB_PATH_CN is set, else the given path."""
+    return os.environ.get("ALPHAGEN_QLIB_PATH") or os.environ.get("QLIB_PATH_CN") or qlib_data_path
+
+
 def initialize_qlib(qlib_data_path: str = _DEFAULT_QLIB_DATA_PATH) -> None:
     import qlib
     from qlib.config import REG_CN
-    qlib.init(provider_uri=qlib_data_path, region=REG_CN)
+    qlib.init(provider_uri=resolve_qlib_path(qlib_data_path), region=REG_CN)
     global _QLIB_INITIALIZED
     _QLIB_INITIALIZED = True
 
